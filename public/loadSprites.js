@@ -1,7 +1,7 @@
 import k from "../src/kaplayCtx";
         
 export default function loadSprites(){
-    k.loadSprite("eliza","/public/assets/char_8-direction.png",{
+    k.loadSprite("eliza","./assets/char_8-direction.png",{
             sliceX:8,
             sliceY:12,
             anims:{
@@ -23,6 +23,6 @@ export default function loadSprites(){
                 "walk-bottom-left": {frames: [45,61],speed: 8,loop: true},
             }
         })
-    k.loadSprite("scene1","/public/assets/scene1-map.png")
+    k.loadSprite("scene1","./assets/scene1-map.png")
 
 }

@@ -23,11 +23,10 @@ const player = k.add([
     { speed: SPEED }
 ]);
 
+player.move()
 
 
 let lastDir = "down";
-
-
 
 
 player.onUpdate(() => {
