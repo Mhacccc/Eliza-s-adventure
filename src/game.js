@@ -94,20 +94,27 @@ async function makeTile(){
     }
         }
 // show
-window.showDialog("You found the key!!!");
-
-// hide (if you need to hide programmatically)
-window.hideDialog();
+setTimeout(()=>{
+    window.showDialog("You wake up at the middle of the night, you don't know where you are");
+},1000)
 
 // example with your collisions:
 const doorLocked = player.onCollide("door", () => {
   if (key === 1) {
-    window.showDialog("Wow you found the key, let's go to the other floor");
+    window.showDialog("Door unlocked!!!\nClick the door to open");
     doorLocked.cancel();
   } else {
     window.showDialog("The door is locked, you must find the key to this door");
   }
 });
+
+
+k.onClick("door",()=>{
+    if(key>0){
+        k.go("scene2")
+    }
+    
+})
 
 const keyFound = player.onCollide("key", () => {
   window.showDialog("You found the key!!!");
@@ -229,6 +236,8 @@ function idleDir(){
 }
 
 
-
+k.scene("scene2",()=>{
+    
+})
 
 export default k;
