@@ -94,9 +94,15 @@ async function makeTile(){
     }
         }
 // show
-setTimeout(()=>{
-    window.showDialog("You wake up in the middle of the night, confused. This place looks like a hotel lobby, but you don’t remember how you got here. The room feels empty, and there’s only one door. You need to get out.");
-},300)
+setTimeout(() => {
+  window.showDialog([
+    "You wake up in the middle of the night, your head heavy and your thoughts unclear.",
+    "The place looks like a hotel lobby, but it feels wrong—too quiet, too empty.",
+    "You don’t remember coming here.",
+    "Across the room, a single door waits. Something inside you says you have to leave… now."
+  ]);
+}, 500);
+
 
 // example with your collisions:
 const doorLocked = player.onCollide("door", () => {
@@ -111,8 +117,9 @@ const doorLocked = player.onCollide("door", () => {
 
 
 
+
 const keyFound = player.onCollide("key", () => {
-  window.showDialog("You found a key lying on the floor. Maybe it opens the door.");
+  window.showDialog("YOU FOUND A KEY LYING ON THE FLOOR!!!!! Maybe it opens the door.");
   key = 1;
   keyFound.cancel(); // recommended so it can't retrigger
 });
