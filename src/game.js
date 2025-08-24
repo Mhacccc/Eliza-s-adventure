@@ -157,7 +157,7 @@ k.onMouseDown((btn) => {
 
   function playDir(anim, dir) {
     if (player.getCurAnim()?.name !== anim) player.play(anim);
-    player.direction = dir;
+    lastDir = dir
   }
 });
 
@@ -198,6 +198,14 @@ k.onKeyRelease(() => {
     if (k.isKeyDown("w") || k.isKeyDown("a") || k.isKeyDown("s") || k.isKeyDown("d")) {
         return; // still moving, do nothing
     }
+    idleDir();
+});
+
+k.onMouseRelease(()=>{
+    idleDir();
+})
+
+function idleDir(){
     switch (lastDir) {
         case "up": player.play("idle-up"); break;
         case "down": player.play("idle-down"); break;
@@ -208,7 +216,7 @@ k.onKeyRelease(() => {
         case "bottom-left": player.play("idle-bottom-left"); break;
         case "bottom-right": player.play("idle-bottom-right"); break;
     }
-});
+}
 
 
 export default k;
