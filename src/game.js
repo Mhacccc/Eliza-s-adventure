@@ -27,7 +27,6 @@ const player = k.make([
     { speed: SPEED }
 ]);
 
-player.move()
 
 
 async function makeTile(){
@@ -52,6 +51,18 @@ async function makeTile(){
                 }
                  continue;
             }
+
+            if(layer.name==="door"){
+                const obj = layer.objects[0];
+                map.add([
+                        k.area({
+                            shape: new k.Rect(k.vec2(0),obj.width, obj.height)
+                        }),
+                        k.pos(obj.x, obj.y),
+                        obj.name
+                ])
+            }
+
             if(layer.name === "key"){
                 const keyObj = layer.objects[0];
                 map.add([
@@ -79,6 +90,17 @@ async function makeTile(){
       }
     }
         }
+        const doorLocked = player.onCollide("door",()=>{
+            if(key===1){
+                k.debug.log("Wow you found the key, let's go the other floor")
+                doorLocked.cancel()
+            }else{
+                k.debug.log("the door is locked, you must find the key to this door")
+                
+            }
+
+        })
+        
  
         const keyFound = player.onCollide("key",()=>{
             k.debug.log("You found the key!!!");
@@ -102,17 +124,49 @@ makeTile()
 
 let lastDir = "down";
 
+// Mouse click movement
+k.onMouseDown((btn) => {
+  if (btn !== "left" || player.isInDialogue) return;
+
+  const worldMousePos = k.toWorld(k.mousePos());
+  player.moveTo(worldMousePos, player.speed);
+
+  // Compute angle from player -> mouse in degrees (-180..180]
+  const dx = worldMousePos.x - player.pos.x;
+  const dy = worldMousePos.y - player.pos.y;
+  const deg = Math.atan2(dy, dx) * 180 / Math.PI;
+
+  // 8-way sectors (22.5° each side of the cardinals)
+  if (deg > -22.5 && deg <= 22.5) {
+    playDir("walk-right", "right");
+  } else if (deg > 22.5 && deg <= 67.5) {
+    playDir("walk-bottom-right", "bottom-right");
+  } else if (deg > 67.5 && deg <= 112.5) {
+    playDir("walk-down", "down");
+  } else if (deg > 112.5 && deg <= 157.5) {
+    playDir("walk-bottom-left", "bottom-left");
+  } else if (deg > 157.5 || deg <= -157.5) {
+    playDir("walk-left", "left");
+  } else if (deg > -157.5 && deg <= -112.5) {
+    playDir("walk-top-left", "top-left");
+  } else if (deg > -112.5 && deg <= -67.5) {
+    playDir("walk-up", "up");
+  } else if (deg > -67.5 && deg <= -22.5) {
+    playDir("walk-top-right", "top-right");
+  }
+
+  function playDir(anim, dir) {
+    if (player.getCurAnim()?.name !== anim) player.play(anim);
+    player.direction = dir;
+  }
+});
+
+
 
 player.onUpdate(() => {
     const dir = k.vec2(0, 0);
 
-    k.onMouseDown((mouseBtn) => {
-    if (mouseBtn !== "left") return;
 
-    const worldMousePos = k.toWorld(k.mousePos());
-    player.moveTo(worldMousePos, 1);
-    })
-    
 
     if (k.isKeyDown("w")) dir.y = -1;
     if (k.isKeyDown("s")) dir.y = 1;
