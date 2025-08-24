@@ -100,30 +100,8 @@
         {
          "draworder":"topdown",
          "id":5,
-         "name":"collisions",
+         "name":"boundaries",
          "objects":[
-                {
-                 "height":19.3333333333333,
-                 "id":5,
-                 "name":"",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":168,
-                 "y":214
-                }, 
-                {
-                 "height":20.6666666666667,
-                 "id":7,
-                 "name":"",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":15.3333333333334,
-                 "x":296.666666666667,
-                 "y":213.333333333333
-                }, 
                 {
                  "height":17.3333333333333,
                  "id":8,
@@ -213,17 +191,6 @@
                  "y":23.3333333333333
                 }, 
                 {
-                 "height":28,
-                 "id":17,
-                 "name":"",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":28.6666666666667,
-                 "x":224.666666666667,
-                 "y":19.3333333333333
-                }, 
-                {
                  "height":7.33333333333334,
                  "id":24,
                  "name":"",
@@ -268,19 +235,52 @@
                  "y":107.333333333333
                 }, 
                 {
-                 "height":4.66666666666666,
-                 "id":28,
+                 "height":12.3333333333333,
+                 "id":37,
                  "name":"",
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":212,
+                 "width":13,
+                 "x":169,
+                 "y":213
+                }, 
+                {
+                 "height":11,
+                 "id":40,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":14.3333333333334,
+                 "x":297.666666666667,
+                 "y":213.666666666667
+                }, 
+                {
+                 "height":16,
+                 "id":41,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":31,
+                 "x":224.333333333333,
+                 "y":17.3333333333333
+                }, 
+                {
+                 "height":3,
+                 "id":43,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":196.333333333333,
                  "x":141.333333333333,
-                 "y":246.666666666667
+                 "y":249
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":false,
+         "visible":true,
          "x":0,
          "y":0
         }, 
@@ -312,19 +312,19 @@
          "name":"spawnpoint",
          "objects":[
                 {
-                 "height":24,
-                 "id":32,
+                 "height":1.33333333333331,
+                 "id":47,
                  "name":"spawnpoint",
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":24.6666666666667,
-                 "x":230,
-                 "y":172
+                 "width":1.33333333333331,
+                 "x":242,
+                 "y":163
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":false,
+         "visible":true,
          "x":0,
          "y":0
         }, 
@@ -351,7 +351,7 @@
          "y":0
         }],
  "nextlayerid":9,
- "nextobjectid":36,
+ "nextobjectid":48,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

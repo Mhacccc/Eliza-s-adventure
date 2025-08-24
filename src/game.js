@@ -3,27 +3,100 @@ import loadSprites from "../public/loadSprites.js";
 
 loadSprites();
 
-k.add([
+let key = 0;
+
+const map = k.add([
     k.sprite("scene1"),
-    k.anchor("center"),
-    k.pos(k.center()),
+    k.pos(0),
     k.scale(3)
+    
 ])
 
 const SPEED = 300;
 
-const player = k.add([
+const player = k.make([
     k.sprite("eliza", { anim: "idle-down" }),
-    k.pos(k.center()),
+    k.pos(),
     k.anchor("center"),
     k.scale(4),
-    k.area(),
+    k.area({
+        shape: new k.Rect(k.vec2(0,3),12,17)
+    }),
     k.body(),
     
     { speed: SPEED }
 ]);
 
 player.move()
+
+
+async function makeTile(){
+
+    try{
+        const mapData = await(await fetch("assets/map.json")).json();
+        const layers = mapData.layers
+
+        console.log(layers)
+        for(const layer of layers){
+            if(layer.name === "boundaries"){
+                for(const obj of layer.objects){
+                    map.add([
+                        
+                        k.area({
+                            shape: new k.Rect(k.vec2(0),obj.width, obj.height)
+                        }),
+                        k.body({ isStatic: true }),
+                        k.pos(obj.x, obj.y),
+                        obj.name
+                    ])
+                }
+                 continue;
+            }
+            if(layer.name === "key"){
+                const keyObj = layer.objects[0];
+                map.add([
+                    k.area({
+                        shape: new k.Rect(k.vec2(0),keyObj.width, keyObj.height)
+                    }),
+                    k.pos(keyObj.x, keyObj.y),
+                    keyObj.name
+                ])
+            }
+
+            if (layer.name === "spawnpoint") {
+            for (const entity of layer.objects) {
+                if (entity.name === "spawnpoint") {
+
+                player.pos = k.vec2(
+                    (map.pos.x + entity.x)*3,
+                    (map.pos.y + entity.y)*3
+                );
+
+
+                k.add(player);
+                continue;
+        }
+      }
+    }
+        }
+    
+    player.onCollide("key",()=>{
+        k.debug.log("You got the key!!!");
+        key = 1;
+        k.debug.log("Key Count: "+ key);
+        
+    })
+    
+
+
+    }catch(error){
+        console.error(error)
+    }
+
+}
+
+makeTile()
+
 
 
 let lastDir = "down";
@@ -55,6 +128,8 @@ player.onUpdate(() => {
     }
     
     k.setCamPos(player.pos)
+
+    
 });
 
 // ---- Idle states ----
@@ -75,4 +150,4 @@ k.onKeyRelease(() => {
 });
 
 
-export default k.go("game");
+export default k;
