@@ -1,6 +1,9 @@
 import k from "./kaplayCtx";
 import loadSprites from "../public/loadSprites.js";
 
+
+
+
 loadSprites();
 
 let key = 0;
@@ -90,23 +93,28 @@ async function makeTile(){
       }
     }
         }
-        const doorLocked = player.onCollide("door",()=>{
-            if(key===1){
-                k.debug.log("Wow you found the key, let's go the other floor")
-                doorLocked.cancel()
-            }else{
-                k.debug.log("the door is locked, you must find the key to this door")
-                
-            }
+// show
+window.showDialog("You found the key!!!");
 
-        })
-        
- 
-        const keyFound = player.onCollide("key",()=>{
-            k.debug.log("You found the key!!!");
-            key = 1;
-            keyFound.cancel();
-        })
+// hide (if you need to hide programmatically)
+window.hideDialog();
+
+// example with your collisions:
+const doorLocked = player.onCollide("door", () => {
+  if (key === 1) {
+    window.showDialog("Wow you found the key, let's go to the other floor");
+    doorLocked.cancel();
+  } else {
+    window.showDialog("The door is locked, you must find the key to this door");
+  }
+});
+
+const keyFound = player.onCollide("key", () => {
+  window.showDialog("You found the key!!!");
+  key = 1;
+  keyFound.cancel(); // recommended so it can't retrigger
+});
+
     
 
     
@@ -117,6 +125,8 @@ async function makeTile(){
     }
 
 }
+
+
 
 makeTile()
 
@@ -217,6 +227,8 @@ function idleDir(){
         case "bottom-right": player.play("idle-bottom-right"); break;
     }
 }
+
+
 
 
 export default k;

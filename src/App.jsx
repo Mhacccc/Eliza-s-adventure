@@ -1,9 +1,10 @@
-import game from "./game.js"
+import TextBox from "./components/TextBox.jsx";
+import  "./game.js"
 
 
 function App() {
 
-    return game;
+    return <TextBox />;
 
 }
 
