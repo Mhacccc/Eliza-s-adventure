@@ -334,24 +334,24 @@
          "name":"key",
          "objects":[
                 {
-                 "height":2.66666666666667,
-                 "id":34,
+                 "height":1.66666666666669,
+                 "id":52,
                  "name":"key",
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":14,
-                 "x":273.333333333333,
-                 "y":98.6666666666667
+                 "width":7,
+                 "x":234.666666666667,
+                 "y":245.333333333333
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":false,
+         "visible":true,
          "x":0,
          "y":0
         }],
  "nextlayerid":9,
- "nextobjectid":48,
+ "nextobjectid":53,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

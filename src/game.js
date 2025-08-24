@@ -79,13 +79,14 @@ async function makeTile(){
       }
     }
         }
+ 
+        const keyFound = player.onCollide("key",()=>{
+            k.debug.log("You found the key!!!");
+            key = 1;
+            keyFound.cancel();
+        })
     
-    player.onCollide("key",()=>{
-        k.debug.log("You got the key!!!");
-        key = 1;
-        k.debug.log("Key Count: "+ key);
-        
-    })
+
     
 
 
@@ -105,6 +106,12 @@ let lastDir = "down";
 player.onUpdate(() => {
     const dir = k.vec2(0, 0);
 
+    k.onMouseDown((mouseBtn) => {
+    if (mouseBtn !== "left") return;
+
+    const worldMousePos = k.toWorld(k.mousePos());
+    player.moveTo(worldMousePos, 1);
+    })
     
 
     if (k.isKeyDown("w")) dir.y = -1;
