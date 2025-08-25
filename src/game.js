@@ -38,7 +38,6 @@ async function makeTile(){
         const mapData = await(await fetch("assets/map.json")).json();
         const layers = mapData.layers
 
-        console.log(layers)
         for(const layer of layers){
             if(layer.name === "boundaries"){
                 for(const obj of layer.objects){
@@ -126,13 +125,10 @@ const keyFound = player.onCollide("key", () => {
 
 k.onClick("door",()=>{
     if(key>0){
-        k.go("scene2")
+        k.go("scene-2")
     }
     
 })
-
-    
-
 
     }catch(error){
         console.error(error)
@@ -142,14 +138,15 @@ k.onClick("door",()=>{
 
 
 
-makeTile()
 
 
 
 let lastDir = "down";
 
 // Mouse click movement
-k.onMouseDown((btn) => {
+function makeMouseControll(){
+
+  return k.onMouseDown((btn) => {
   if (btn !== "left" || player.isInDialogue) return;
 
   const worldMousePos = k.toWorld(k.mousePos());
@@ -184,13 +181,15 @@ k.onMouseDown((btn) => {
     lastDir = dir
   }
 });
+}
 
+makeMouseControll()
 
 
 player.onUpdate(() => {
     const dir = k.vec2(0, 0);
 
-
+    
 
     if (k.isKeyDown("w")) dir.y = -1;
     if (k.isKeyDown("s")) dir.y = 1;
@@ -214,10 +213,7 @@ player.onUpdate(() => {
     
     k.setCamPos(player.pos)
 
-    
-});
-
-// ---- Idle states ----
+    // ---- Idle states ----
 k.onKeyRelease(() => {
     if (k.isKeyDown("w") || k.isKeyDown("a") || k.isKeyDown("s") || k.isKeyDown("d")) {
         return; // still moving, do nothing
@@ -243,8 +239,52 @@ function idleDir(){
 }
 
 
-k.scene("scene2",()=>{
     
+});
+
+
+
+k.scene("scene-2",async ()=>{
+      const map2 = k.add([
+            k.sprite("scene2"),
+            k.scale(3),
+            k.pos(0),
+      ])
+
+    const mapData= await (await fetch("assets/scene2-map.json")).json();
+    const layers = mapData.layers
+
+    for(const layer of layers){
+      if(layer.name==="boundaries"){
+        for(const boundary of layer.objects){
+            map2.add([
+              k.area({
+                shape: new k.Rect(k.vec2(0),boundary.width,boundary.height)
+              }),
+              k.pos(boundary.x,boundary.y),
+              k.body({isStatic: true}),
+              boundary.name
+            ])
+        }
+      }
+      if(layer.name === "spawnpoint"){
+        const spawnpoint = layer.objects[0];
+        player.pos = k.vec2((map2.pos.x + spawnpoint.x)*3, (map2.pos.y + spawnpoint.y)*3)
+        k.add(player)
+      }
+    }
+
+
+
+  
+  makeMouseControll()
+  
+
+
+
 })
+
+makeTile()
+
 
 export default k;

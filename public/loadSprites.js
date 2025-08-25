@@ -23,6 +23,8 @@ export default function loadSprites(){
                 "walk-bottom-left": {frames: [45,61],speed: 8,loop: true},
             }
         })
-    k.loadSprite("scene1","./assets/scene1-map.png")
+    k.loadSprite("scene1","./assets/scene1-map.png");
+    k.loadSprite("scene2","./assets/scene2-map.png");
+
 
 }
