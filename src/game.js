@@ -106,7 +106,7 @@ setTimeout(() => {
 // example with your collisions:
 const doorLocked = player.onCollide("door", () => {
   if (key === 1) {
-    window.showDialog("Door unlocked!!! Click the door to open");
+    window.showDialog("Door unlocked!!! Click the door to enter");
     doorLocked.cancel();
   } else {
     window.showDialog("The door is locked. You need to find the key.");
@@ -250,6 +250,8 @@ k.scene("scene-2",async ()=>{
             k.scale(3),
             k.pos(0),
       ])
+      
+
 
     const mapData= await (await fetch("assets/scene2-map.json")).json();
     const layers = mapData.layers
@@ -280,6 +282,12 @@ k.scene("scene-2",async ()=>{
   makeMouseControll()
   
 
+    k.add([
+            k.sprite("scene2-walkthrough"),
+            k.scale(3),
+            k.pos(0),
+      ])
+  
 
 
 })

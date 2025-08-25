@@ -25,6 +25,6 @@ export default function loadSprites(){
         })
     k.loadSprite("scene1","./assets/scene1-map.png");
     k.loadSprite("scene2","./assets/scene2-map.png");
-
+    k.loadSprite("scene2-walkthrough","./assets/scene2-walk-through.png")
 
 }
