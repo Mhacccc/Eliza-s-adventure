@@ -272,10 +272,14 @@ k.scene("scene-2",async ()=>{
       if(layer.name === "spawnpoint"){
         const spawnpoint = layer.objects[0];
         player.pos = k.vec2((map2.pos.x + spawnpoint.x)*3, (map2.pos.y + spawnpoint.y)*3)
-        k.add(player)
+        k.add(player)  
       }
-    }
 
+
+    }
+    
+    
+      
 
 
   
