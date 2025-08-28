@@ -283,7 +283,9 @@ k.scene("scene-2",async ()=>{
 
 
     }
-    
+    player.onCollide("right-gate",()=>{
+      k.go("right-scene")
+    })
     
       
 
@@ -298,7 +300,65 @@ k.scene("scene-2",async ()=>{
             k.pos(0),
       ])
   
+      
 
+})
+
+k.scene("right-scene",async()=>{
+        const rightMap = k.add([
+            k.sprite("right-scene"),
+            k.scale(3),
+            k.pos(0),
+      ])
+
+    const mapData= await (await fetch("assets/right-scene.json")).json();
+    const layers = mapData.layers
+    for (const layer of layers) {
+      if (layer.name === "boundaries") {
+        for (const boundary of layer.objects) {
+          rightMap.add([
+            k.area({
+              shape: new k.Rect(k.vec2(0), boundary.width, boundary.height)
+            }),
+            k.pos(boundary.x, boundary.y),
+            k.body({ isStatic: true }),
+            boundary.name
+          ]);
+        }
+      }
+      if (layer.name === "spawnpoint") {
+        const spawnpoint = layer.objects[0];
+        player.pos = k.vec2((rightMap.pos.x + spawnpoint.x) * 3, (rightMap.pos.y + spawnpoint.y) * 3);
+        k.add(player);
+        await k.loop(0.1, () => {
+          player.move(player.speed, 0);
+          if (player.getCurAnim()?.name !== "walk-right") player.play("walk-right");
+        }, 8);
+        player.play("idle-right");
+      }
+    }
+
+        k.add([
+            k.sprite("right-scene-upmost"),
+            k.scale(3),
+            k.pos(0),
+      ])
+
+      player.onCollide("deadman",()=>{
+       
+          window.showDialog("Please, Help me!!!");
+
+      })
+      player.onCollide("Password",()=>{
+          
+          
+          const ans =  prompt("Enter the password!")
+          
+
+          if(ans==="1234"){
+            window.showDialog("CONGRATSSSS!!!");
+          }
+      })
 
 })
 
