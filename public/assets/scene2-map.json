@@ -416,17 +416,6 @@
                  "y":273
                 }, 
                 {
-                 "height":19.3333333333333,
-                 "id":21,
-                 "name":"",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":4,
-                 "x":483.333333333333,
-                 "y":252.333333333333
-                }, 
-                {
                  "height":14,
                  "id":22,
                  "name":"",
@@ -526,17 +515,6 @@
                  "y":278.666666666667
                 }, 
                 {
-                 "height":10.6666666666666,
-                 "id":37,
-                 "name":"",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":3.66666666666669,
-                 "x":486.666666666667,
-                 "y":248
-                }, 
-                {
                  "height":1.33333333333335,
                  "id":38,
                  "name":"",
@@ -601,6 +579,34 @@
                  "width":29,
                  "x":449.333333333333,
                  "y":267.333333333333
+                }, 
+                {
+                 "height":0,
+                 "id":74,
+                 "name":"",
+                 "polygon":[
+                        {
+                         "x":0,
+                         "y":0
+                        }, 
+                        {
+                         "x":7.66666666666669,
+                         "y":-10.6666666666666
+                        }, 
+                        {
+                         "x":7.33333333333331,
+                         "y":11.6666666666667
+                        }, 
+                        {
+                         "x":-0.333333333333314,
+                         "y":12
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":481.333333333333,
+                 "y":257.666666666667
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -676,7 +682,7 @@
          "y":0
         }],
  "nextlayerid":8,
- "nextobjectid":74,
+ "nextobjectid":75,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -755,6 +761,19 @@
          "imagewidth":1216,
          "margin":0,
          "name":"Room_Builder_16x16",
+         "spacing":0,
+         "tilecount":8284,
+         "tileheight":16,
+         "tilewidth":16
+        }, 
+        {
+         "columns":76,
+         "firstgid":26521,
+         "image":"..\/..\/..\/..\/GAME SPRITES\/Modern Interiors RPG Tileset\/Modern_Interiors\/1_Interiors\/16x16\/Room_Builder_16x16.png",
+         "imageheight":1744,
+         "imagewidth":1216,
+         "margin":0,
+         "name":"right-scene",
          "spacing":0,
          "tilecount":8284,
          "tileheight":16,
