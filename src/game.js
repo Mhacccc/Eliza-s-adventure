@@ -245,6 +245,7 @@ function idleDir(){
 
 
 k.scene("scene-2",async ()=>{
+  await k.wait(1)
       const map2 = k.add([
             k.sprite("scene2"),
             k.scale(3),
@@ -305,6 +306,7 @@ k.scene("scene-2",async ()=>{
 })
 
 k.scene("right-scene",async()=>{
+  await k.wait(1)
         const rightMap = k.add([
             k.sprite("right-scene"),
             k.scale(3),
@@ -351,14 +353,14 @@ k.scene("right-scene",async()=>{
       })
       player.onCollide("Password",()=>{
           
-          
-          const ans =  prompt("Enter the password!")
+  
+          window.showDialog("Enter PassWord")
           
 
-          if(ans==="1234"){
-            window.showDialog("CONGRATSSSS!!!");
-          }
+
+          
       })
+      
       makeMouseControll()
 
 })
