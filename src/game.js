@@ -306,7 +306,7 @@ k.scene("scene-2",async ()=>{
 })
 
 k.scene("right-scene",async()=>{
-  await k.wait(1)
+  await k.wait(1.5)
         const rightMap = k.add([
             k.sprite("right-scene"),
             k.scale(3),
