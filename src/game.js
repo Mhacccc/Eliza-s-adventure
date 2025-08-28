@@ -359,6 +359,7 @@ k.scene("right-scene",async()=>{
             window.showDialog("CONGRATSSSS!!!");
           }
       })
+      makeMouseControll()
 
 })
 
