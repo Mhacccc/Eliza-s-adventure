@@ -245,18 +245,18 @@ function idleDir(){
 
 
 k.scene("scene-2",async ()=>{
-  await k.wait(1)
-      const map2 = k.add([
+
+
+
+
+    const mapData= await (await fetch("assets/scene2-map.json")).json();
+    const layers = mapData.layers
+    const map2 = k.add([
             k.sprite("scene2"),
             k.scale(3),
             k.pos(0),
       ])
       
-
-
-    const mapData= await (await fetch("assets/scene2-map.json")).json();
-    const layers = mapData.layers
-
     for(const layer of layers){
       if(layer.name==="boundaries"){
         for(const boundary of layer.objects){
@@ -306,15 +306,16 @@ k.scene("scene-2",async ()=>{
 })
 
 k.scene("right-scene",async()=>{
-  await k.wait(1.5)
-        const rightMap = k.add([
+  
+
+    const mapData= await (await fetch("assets/right-scene.json")).json();
+    const layers = mapData.layers
+    const rightMap = k.add([
             k.sprite("right-scene"),
             k.scale(3),
             k.pos(0),
       ])
-
-    const mapData= await (await fetch("assets/right-scene.json")).json();
-    const layers = mapData.layers
+    
     for (const layer of layers) {
       if (layer.name === "boundaries") {
         for (const boundary of layer.objects) {
