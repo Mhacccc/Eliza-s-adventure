@@ -1,5 +1,6 @@
 import k from "./kaplayCtx";
 import loadSprites from "../public/loadSprites.js";
+import { area } from "motion/react-client";
 
 
 
@@ -7,6 +8,7 @@ import loadSprites from "../public/loadSprites.js";
 loadSprites();
 
 let key = 0;
+let gateKey = 1;
 
 const map = k.add([
     k.sprite("scene1"),
@@ -26,6 +28,8 @@ const player = k.make([
         shape: new k.Rect(k.vec2(0,3),12,17)
     }),
     k.body(),
+    k.z(10),
+    k.offscreen(),
     
     { speed: SPEED }
 ]);
@@ -244,62 +248,80 @@ function idleDir(){
 
 
 
-k.scene("scene-2",async ()=>{
-
-
-
+k.scene("scene-2",async (spawns="spawnpoint",idleSpawn="idle-up")=>{
+    // Create container for better rendering performance
+    const container = k.add([k.pos(0), k.z(0)]);
 
     const mapData= await (await fetch("assets/scene2-map.json")).json();
-    const layers = mapData.layers
-    const map2 = k.add([
+    const layers = mapData.layers;
+
+    // Add base map to container
+    const map2 = container.add([
             k.sprite("scene2"),
             k.scale(3),
-            k.pos(0),
-      ])
+            k.pos(0)
+    ]);
       
     for(const layer of layers){
       if(layer.name==="boundaries"){
-        for(const boundary of layer.objects){
-            map2.add([
-              k.area({
-                shape: new k.Rect(k.vec2(0),boundary.width,boundary.height)
-              }),
-              k.pos(boundary.x,boundary.y),
-              k.body({isStatic: true}),
-              boundary.name
-            ])
-        }
-      }
-      if(layer.name === "spawnpoint"){
-        const spawnpoint = layer.objects[0];
-        player.pos = k.vec2((map2.pos.x + spawnpoint.x)*3, (map2.pos.y + spawnpoint.y)*3)
-        k.add(player)
-        await k.loop(0.1,()=>{
-            player.move(0,-player.speed)
-            if (player.getCurAnim()?.name !== "walk-up")player.play("walk-up") 
-        },8)  
-        player.play("idle-up")
+        // Batch add boundaries
+        const boundaries = layer.objects.map(boundary => ({
+          area: {
+            shape: new k.Rect(k.vec2(0), boundary.width, boundary.height)
+          },
+          pos: k.vec2(boundary.x, boundary.y),
+          body: { isStatic: true },
+          id: boundary.name
+        }));
         
+        boundaries.forEach(b => {
+          map2.add([
+            k.area(b.area),
+            k.pos(b.pos),
+            k.body(b.body),
+            b.id
+          ]);
+        });
       }
-
-
-    }
-    player.onCollide("right-gate",()=>{
-      k.go("right-scene")
-    })
-    
       
+      if(layer.name === spawns){
+        const spawnpoint = layer.objects[0];
+        player.pos = k.vec2((map2.pos.x + spawnpoint.x)*3, (map2.pos.y + spawnpoint.y)*3);
+        
+        // Cache movement parameters
+        const movement = {
+          "spawnpoint": { x: 0, y: -player.speed, anim: "walk-up" },
+          "right-spawnpoint": { x: -player.speed, y: 0, anim: "walk-left" },
+          "left-spawnpoint": { x: player.speed, y: 0, anim: "walk-right" }
+        }[spawns];
 
+        k.add(player);
+        
+        // More efficient movement loop
+         await k.loop(0.1, () => {
+          player.move(movement.x, movement.y);
+          if (player.getCurAnim()?.name !== movement.anim) {
+            player.play(movement.anim);
+          }
+        }, 8);
+        
+        player.play(idleSpawn);
+      }
+    }
 
-  
-  makeMouseControll()
-  
+    player.onCollide("right-gate", () => {
+      k.go("right-scene");
+    });
+    
+    makeMouseControll();
 
+    // Add walkthrough layer last to ensure proper z-indexing
     k.add([
             k.sprite("scene2-walkthrough"),
             k.scale(3),
             k.pos(0),
-      ])
+            k.z(20)
+    ]);
   
       
 
@@ -314,8 +336,16 @@ k.scene("right-scene",async()=>{
             k.sprite("right-scene"),
             k.scale(3),
             k.pos(0),
+            k.offscreen()
       ])
-    
+    const gate = rightMap.add([
+            k.sprite("gate"),
+            k.pos(320,112),
+            "gate"
+            
+      ])   
+ 
+ 
     for (const layer of layers) {
       if (layer.name === "boundaries") {
         for (const boundary of layer.objects) {
@@ -340,11 +370,13 @@ k.scene("right-scene",async()=>{
         player.play("idle-right");
       }
     }
+    
 
         k.add([
             k.sprite("right-scene-upmost"),
             k.scale(3),
             k.pos(0),
+            k.z(20)
       ])
 
       player.onCollide("deadman",()=>{
@@ -354,12 +386,22 @@ k.scene("right-scene",async()=>{
       })
       player.onCollide("Password",()=>{
           
-  
+        
           window.showDialog("Enter PassWord")
-          
+                
+      })
 
-
-          
+      player.onCollide("gate-locked",async()=>{
+        if(gateKey === 0){
+          window.showDialog("The gate is locked! You need to find the key")
+          return;
+        }
+        gate.play("gate-open")
+        await k.wait(0.3)
+        rightMap.get("gate-locked")[0].pos = k.vec2(0,0)
+      })
+      player.onCollide("scene-2-right",()=>{
+        k.go("scene-2","right-spawnpoint","idle-left")
       })
       
       makeMouseControll()
@@ -367,6 +409,7 @@ k.scene("right-scene",async()=>{
 })
 
 makeTile()
+
 
 
 export default k;

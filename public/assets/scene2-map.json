@@ -521,9 +521,32 @@
          "visible":true,
          "x":0,
          "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":8,
+         "name":"right-spawnpoint",
+         "objects":[
+                {
+                 "height":0,
+                 "id":83,
+                 "name":"",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":527,
+                 "y":225
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
         }],
- "nextlayerid":8,
- "nextobjectid":82,
+ "nextlayerid":9,
+ "nextobjectid":84,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
