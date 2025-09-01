@@ -9,7 +9,10 @@ loadSprites();
 
 let key = 0;
 let gateKey = 1;
-
+let isGateOpen = false;
+let isGateRemoved = false;
+let isDoorRemoved = false;
+ 
 const map = k.add([
     k.sprite("scene1"),
     k.pos(0),
@@ -19,20 +22,123 @@ const map = k.add([
 
 const SPEED = 300;
 
-const player = k.make([
-    k.sprite("eliza", { anim: "idle-down" }),
-    k.pos(),
-    k.anchor("center"),
-    k.scale(4),
-    k.area({
-        shape: new k.Rect(k.vec2(0,3),12,17)
-    }),
-    k.body(),
-    k.z(10),
-    k.offscreen(),
-    
-    { speed: SPEED }
-]);
+function createPlayer() {
+    const newPlayer = k.make([
+        k.sprite("eliza", { anim: "idle-down" }),
+        k.pos(),
+        k.anchor("center"),
+        k.scale(4),
+        k.area({
+            shape: new k.Rect(k.vec2(0,3),12,17)
+        }),
+        k.body(),
+        k.z(10),
+        k.offscreen(),
+        { speed: SPEED }
+    ]);
+
+    // Add player update behavior
+    newPlayer.onUpdate(() => {
+        const dir = k.vec2(0, 0);
+
+        if (k.isKeyDown("w")) dir.y = -1;
+        if (k.isKeyDown("s")) dir.y = 1;
+        if (k.isKeyDown("a")) dir.x = -1;
+        if (k.isKeyDown("d")) dir.x = 1;
+
+        if (dir.x !== 0 || dir.y !== 0) {
+            const unit = dir.unit().scale(newPlayer.speed);
+            newPlayer.move(unit);
+
+            // ---- Animations for 8-way ----
+            if (dir.x < 0 && dir.y < 0) { if (newPlayer.getCurAnim()?.name !== "walk-top-left") newPlayer.play("walk-top-left"); lastDir = "top-left"; }
+            else if (dir.x > 0 && dir.y < 0) { if (newPlayer.getCurAnim()?.name !== "walk-top-right") newPlayer.play("walk-top-right"); lastDir = "top-right"; }
+            else if (dir.x < 0 && dir.y > 0) { if (newPlayer.getCurAnim()?.name !== "walk-bottom-left") newPlayer.play("walk-bottom-left"); lastDir = "bottom-left"; }
+            else if (dir.x > 0 && dir.y > 0) { if (newPlayer.getCurAnim()?.name !== "walk-bottom-right") newPlayer.play("walk-bottom-right"); lastDir = "bottom-right"; }
+            else if (dir.x < 0) { if (newPlayer.getCurAnim()?.name !== "walk-left") newPlayer.play("walk-left"); lastDir = "left"; }
+            else if (dir.x > 0) { if (newPlayer.getCurAnim()?.name !== "walk-right") newPlayer.play("walk-right"); lastDir = "right"; }
+            else if (dir.y < 0) { if (newPlayer.getCurAnim()?.name !== "walk-up") newPlayer.play("walk-up"); lastDir = "up"; }
+            else if (dir.y > 0) { if (newPlayer.getCurAnim()?.name !== "walk-down") newPlayer.play("walk-down"); lastDir = "down"; }
+        }
+        
+        k.setCamPos(newPlayer.pos);
+    });
+
+    // Add key release behavior for idle animations
+    k.onKeyRelease(() => {
+        if (k.isKeyDown("w") || k.isKeyDown("a") || k.isKeyDown("s") || k.isKeyDown("d")) {
+            return; // still moving, do nothing
+        }
+        switch (lastDir) {
+            case "up": newPlayer.play("idle-up"); break;
+            case "down": newPlayer.play("idle-down"); break;
+            case "left": newPlayer.play("idle-left"); break;
+            case "right": newPlayer.play("idle-right"); break;
+            case "top-left": newPlayer.play("idle-top-left"); break;
+            case "top-right": newPlayer.play("idle-top-right"); break;
+            case "bottom-left": newPlayer.play("idle-bottom-left"); break;
+            case "bottom-right": newPlayer.play("idle-bottom-right"); break;
+        }
+    });
+
+    // Add mouse movement behavior
+    k.onMouseDown((btn) => {
+        if (btn !== "left" || newPlayer.isInDialogue) return;
+
+        const worldMousePos = k.toWorld(k.mousePos());
+        newPlayer.moveTo(worldMousePos, newPlayer.speed);
+
+        // Compute angle from player -> mouse in degrees (-180..180]
+        const dx = worldMousePos.x - newPlayer.pos.x;
+        const dy = worldMousePos.y - newPlayer.pos.y;
+        const deg = Math.atan2(dy, dx) * 180 / Math.PI;
+
+        // 8-way sectors (22.5° each side of the cardinals)
+        if (deg > -22.5 && deg <= 22.5) {
+            if (newPlayer.getCurAnim()?.name !== "walk-right") newPlayer.play("walk-right");
+            lastDir = "right";
+        } else if (deg > 22.5 && deg <= 67.5) {
+            if (newPlayer.getCurAnim()?.name !== "walk-bottom-right") newPlayer.play("walk-bottom-right");
+            lastDir = "bottom-right";
+        } else if (deg > 67.5 && deg <= 112.5) {
+            if (newPlayer.getCurAnim()?.name !== "walk-down") newPlayer.play("walk-down");
+            lastDir = "down";
+        } else if (deg > 112.5 && deg <= 157.5) {
+            if (newPlayer.getCurAnim()?.name !== "walk-bottom-left") newPlayer.play("walk-bottom-left");
+            lastDir = "bottom-left";
+        } else if (deg > 157.5 || deg <= -157.5) {
+            if (newPlayer.getCurAnim()?.name !== "walk-left") newPlayer.play("walk-left");
+            lastDir = "left";
+        } else if (deg > -157.5 && deg <= -112.5) {
+            if (newPlayer.getCurAnim()?.name !== "walk-top-left") newPlayer.play("walk-top-left");
+            lastDir = "top-left";
+        } else if (deg > -112.5 && deg <= -67.5) {
+            if (newPlayer.getCurAnim()?.name !== "walk-up") newPlayer.play("walk-up");
+            lastDir = "up";
+        } else if (deg > -67.5 && deg <= -22.5) {
+            if (newPlayer.getCurAnim()?.name !== "walk-top-right") newPlayer.play("walk-top-right");
+            lastDir = "top-right";
+        }
+    });
+
+    // Add mouse release behavior for idle animations
+    k.onMouseRelease(() => {
+        switch (lastDir) {
+            case "up": newPlayer.play("idle-up"); break;
+            case "down": newPlayer.play("idle-down"); break;
+            case "left": newPlayer.play("idle-left"); break;
+            case "right": newPlayer.play("idle-right"); break;
+            case "top-left": newPlayer.play("idle-top-left"); break;
+            case "top-right": newPlayer.play("idle-top-right"); break;
+            case "bottom-left": newPlayer.play("idle-bottom-left"); break;
+            case "bottom-right": newPlayer.play("idle-bottom-right"); break;
+        }
+    });
+
+    return newPlayer;
+}
+
+let player = createPlayer();
 
 
 
@@ -190,61 +296,7 @@ function makeMouseControll(){
 makeMouseControll()
 
 
-player.onUpdate(() => {
-    const dir = k.vec2(0, 0);
 
-    
-
-    if (k.isKeyDown("w")) dir.y = -1;
-    if (k.isKeyDown("s")) dir.y = 1;
-    if (k.isKeyDown("a")) dir.x = -1;
-    if (k.isKeyDown("d")) dir.x = 1;
-
-    if (dir.x !== 0 || dir.y !== 0) {
-        const unit = dir.unit().scale(player.speed);
-        player.move(unit);
-
-        // ---- Animations for 8-way ----
-        if (dir.x < 0 && dir.y < 0) { if (player.getCurAnim()?.name !== "walk-top-left")player.play("walk-top-left"); lastDir = "top-left"; }
-        else if (dir.x > 0 && dir.y < 0) { if (player.getCurAnim()?.name !== "walk-top-right")player.play("walk-top-right"); lastDir = "top-right"; }
-        else if (dir.x < 0 && dir.y > 0) { if (player.getCurAnim()?.name !== "walk-bottom-left")player.play("walk-bottom-left"); lastDir = "bottom-left"; }
-        else if (dir.x > 0 && dir.y > 0) { if (player.getCurAnim()?.name !== "walk-bottom-right")player.play("walk-bottom-right"); lastDir = "bottom-right"; }
-        else if (dir.x < 0) { if (player.getCurAnim()?.name !== "walk-left")player.play("walk-left"); lastDir = "left"; }
-        else if (dir.x > 0) { if (player.getCurAnim()?.name !== "walk-right")player.play("walk-right"); lastDir = "right"; }
-        else if (dir.y < 0) { if (player.getCurAnim()?.name !== "walk-up")player.play("walk-up"); lastDir = "up"; }
-        else if (dir.y > 0) { if (player.getCurAnim()?.name !== "walk-down")player.play("walk-down"); lastDir = "down"; }
-    }
-    
-    k.setCamPos(player.pos)
-
-    // ---- Idle states ----
-k.onKeyRelease(() => {
-    if (k.isKeyDown("w") || k.isKeyDown("a") || k.isKeyDown("s") || k.isKeyDown("d")) {
-        return; // still moving, do nothing
-    }
-    idleDir();
-});
-
-k.onMouseRelease(()=>{
-    idleDir();
-})
-
-function idleDir(){
-    switch (lastDir) {
-        case "up": player.play("idle-up"); break;
-        case "down": player.play("idle-down"); break;
-        case "left": player.play("idle-left"); break;
-        case "right": player.play("idle-right"); break;
-        case "top-left": player.play("idle-top-left"); break;
-        case "top-right": player.play("idle-top-right"); break;
-        case "bottom-left": player.play("idle-bottom-left"); break;
-        case "bottom-right": player.play("idle-bottom-right"); break;
-    }
-}
-
-
-    
-});
 
 
 
@@ -261,6 +313,13 @@ k.scene("scene-2",async (spawns="spawnpoint",idleSpawn="idle-up")=>{
             k.scale(3),
             k.pos(0)
     ]);
+
+    const doorFinal = map2.add([
+        k.sprite("door-final",{
+          frame: !isDoorRemoved?0:4
+        }),
+        k.pos(k.vec2(400,128))
+      ])
       
     for(const layer of layers){
       if(layer.name==="boundaries"){
@@ -273,8 +332,15 @@ k.scene("scene-2",async (spawns="spawnpoint",idleSpawn="idle-up")=>{
           body: { isStatic: true },
           id: boundary.name
         }));
-        
+
         boundaries.forEach(b => {
+
+          if(isDoorRemoved){
+            if(b.id==="door-final"){
+              console.log(b.id)
+              return;
+            }
+          }
           map2.add([
             k.area(b.area),
             k.pos(b.pos),
@@ -283,9 +349,17 @@ k.scene("scene-2",async (spawns="spawnpoint",idleSpawn="idle-up")=>{
           ]);
         });
       }
+
+     
+
       
       if(layer.name === spawns){
         const spawnpoint = layer.objects[0];
+        
+        // Create new player instance for this scene
+        player.destroy();
+        player = createPlayer();
+        
         player.pos = k.vec2((map2.pos.x + spawnpoint.x)*3, (map2.pos.y + spawnpoint.y)*3);
         
         // Cache movement parameters
@@ -312,8 +386,6 @@ k.scene("scene-2",async (spawns="spawnpoint",idleSpawn="idle-up")=>{
     player.onCollide("right-gate", () => {
       k.go("right-scene");
     });
-    
-    makeMouseControll();
 
     // Add walkthrough layer last to ensure proper z-indexing
     k.add([
@@ -323,7 +395,14 @@ k.scene("scene-2",async (spawns="spawnpoint",idleSpawn="idle-up")=>{
             k.z(20)
     ]);
   
+    player.onCollide("door-final",async ()=>{
       
+        doorFinal.play("door-final-open")
+        await k.wait(0.5)
+        map2.get("door-final")[0].paused = true
+        isDoorRemoved = true
+        
+    })
 
 })
 
@@ -339,7 +418,9 @@ k.scene("right-scene",async()=>{
             k.offscreen()
       ])
     const gate = rightMap.add([
-            k.sprite("gate"),
+            k.sprite("gate",{
+              frame: !isGateOpen?0:4
+            }),
             k.pos(320,112),
             "gate"
             
@@ -359,8 +440,14 @@ k.scene("right-scene",async()=>{
           ]);
         }
       }
+
       if (layer.name === "spawnpoint") {
         const spawnpoint = layer.objects[0];
+        
+        // Create new player instance for this scene
+        player.destroy();
+        player = createPlayer();
+        
         player.pos = k.vec2((rightMap.pos.x + spawnpoint.x) * 3, (rightMap.pos.y + spawnpoint.y) * 3);
         k.add(player);
         await k.loop(0.1, () => {
@@ -371,6 +458,9 @@ k.scene("right-scene",async()=>{
       }
     }
     
+    if(isGateRemoved){
+      rightMap.get("gate-locked")[0].destroy();
+    }
 
         k.add([
             k.sprite("right-scene-upmost"),
@@ -398,14 +488,16 @@ k.scene("right-scene",async()=>{
         }
         gate.play("gate-open")
         await k.wait(0.3)
-        rightMap.get("gate-locked")[0].pos = k.vec2(0,0)
+        rightMap.get("gate-locked")[0].destroy()
+        isGateOpen = true;
+        isGateRemoved = true;
       })
+    
+
+
       player.onCollide("scene-2-right",()=>{
         k.go("scene-2","right-spawnpoint","idle-left")
       })
-      
-      makeMouseControll()
-
 })
 
 makeTile()

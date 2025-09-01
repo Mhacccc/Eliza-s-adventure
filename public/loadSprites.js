@@ -35,8 +35,20 @@ export default function loadSprites(){
             "gate-open":{
                 from: 0,
                 to:4,
-            }
+            },
+            "gate-idle-open":4
         }
     })
+    k.loadSprite("door-final","./assets/door-final.png",{
+        sliceX:5,
+        anims:{
+            "door-final-locked": 0,
+            "door-final-open":{
+                from:0,
+                to:4,
+            },
+            "door-idle-open":4,
 
+        }
+    })
 }
