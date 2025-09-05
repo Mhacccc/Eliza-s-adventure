@@ -12,18 +12,22 @@ export default function TextBox() {
     window.showDialog = (msg) => {
       if (typeof msg === "string") {
         setDialogues([msg]); // single string -> wrap in array
+        window.isInDialogue = true;
       } else if (Array.isArray(msg)) {
         setDialogues(msg); // array of dialogues
+        window.isInDialogue = true;
       }
       setCurrentIndex(0);
       setVisible(true);
     };
 
     window.hideDialog = () => setVisible(false);
+    
 
     return () => {
       delete window.showDialog;
       delete window.hideDialog;
+      delete window.isInDialogue;
     };
   }, []);
 
@@ -32,6 +36,7 @@ export default function TextBox() {
       setCurrentIndex(currentIndex + 1); // next line
     } else {
       setVisible(false); // close after last line
+      window.isInDialogue = false;
     }
   };
 

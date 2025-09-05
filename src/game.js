@@ -34,13 +34,15 @@ function createPlayer() {
         k.body(),
         k.z(10),
         k.offscreen(),
-        { speed: SPEED }
+        { 
+          speed: SPEED,
+         }
     ]);
 
     // Add player update behavior
     newPlayer.onUpdate(() => {
         const dir = k.vec2(0, 0);
-
+        
         if (k.isKeyDown("w")) dir.y = -1;
         if (k.isKeyDown("s")) dir.y = 1;
         if (k.isKeyDown("a")) dir.x = -1;
@@ -83,7 +85,7 @@ function createPlayer() {
 
     // Add mouse movement behavior
     k.onMouseDown((btn) => {
-        if (btn !== "left" || newPlayer.isInDialogue) return;
+        if (btn !== "left" || window.isInDialogue) return;
 
         const worldMousePos = k.toWorld(k.mousePos());
         newPlayer.moveTo(worldMousePos, newPlayer.speed);
@@ -254,46 +256,6 @@ k.onClick("door",()=>{
 let lastDir = "down";
 
 // Mouse click movement
-function makeMouseControll(){
-
-  return k.onMouseDown((btn) => {
-  if (btn !== "left" || player.isInDialogue) return;
-
-  const worldMousePos = k.toWorld(k.mousePos());
-  player.moveTo(worldMousePos, player.speed);
-
-  // Compute angle from player -> mouse in degrees (-180..180]
-  const dx = worldMousePos.x - player.pos.x;
-  const dy = worldMousePos.y - player.pos.y;
-  const deg = Math.atan2(dy, dx) * 180 / Math.PI;
-
-  // 8-way sectors (22.5° each side of the cardinals)
-  if (deg > -22.5 && deg <= 22.5) {
-    playDir("walk-right", "right");
-  } else if (deg > 22.5 && deg <= 67.5) {
-    playDir("walk-bottom-right", "bottom-right");
-  } else if (deg > 67.5 && deg <= 112.5) {
-    playDir("walk-down", "down");
-  } else if (deg > 112.5 && deg <= 157.5) {
-    playDir("walk-bottom-left", "bottom-left");
-  } else if (deg > 157.5 || deg <= -157.5) {
-    playDir("walk-left", "left");
-  } else if (deg > -157.5 && deg <= -112.5) {
-    playDir("walk-top-left", "top-left");
-  } else if (deg > -112.5 && deg <= -67.5) {
-    playDir("walk-up", "up");
-  } else if (deg > -67.5 && deg <= -22.5) {
-    playDir("walk-top-right", "top-right");
-  }
-
-  function playDir(anim, dir) {
-    if (player.getCurAnim()?.name !== anim) player.play(anim);
-    lastDir = dir
-  }
-});
-}
-
-makeMouseControll()
 
 
 
@@ -337,7 +299,7 @@ k.scene("scene-2",async (spawns="spawnpoint",idleSpawn="idle-up")=>{
 
           if(isDoorRemoved){
             if(b.id==="door-final"){
-              console.log(b.id)
+
               return;
             }
           }
