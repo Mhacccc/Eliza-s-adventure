@@ -40,6 +40,7 @@ export default function TextBox() {
     }
   };
 
+
   return (
     <AnimatePresence>
       {visible && (
@@ -52,6 +53,7 @@ export default function TextBox() {
           transition={{ duration: 0.30, ease: "easeOut" }}
         >
           <p id="dialogue" className="ui-text">{dialogues[currentIndex]}</p>
+          
           <div className="btn-container">
             <button
               id="close"

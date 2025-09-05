@@ -34,15 +34,13 @@ function createPlayer() {
         k.body(),
         k.z(10),
         k.offscreen(),
-        { 
-          speed: SPEED,
-         }
+        { speed: SPEED }
     ]);
 
     // Add player update behavior
     newPlayer.onUpdate(() => {
         const dir = k.vec2(0, 0);
-        
+
         if (k.isKeyDown("w")) dir.y = -1;
         if (k.isKeyDown("s")) dir.y = 1;
         if (k.isKeyDown("a")) dir.x = -1;
@@ -259,9 +257,6 @@ let lastDir = "down";
 
 
 
-
-
-
 k.scene("scene-2",async (spawns="spawnpoint",idleSpawn="idle-up")=>{
     // Create container for better rendering performance
     const container = k.add([k.pos(0), k.z(0)]);
@@ -299,7 +294,7 @@ k.scene("scene-2",async (spawns="spawnpoint",idleSpawn="idle-up")=>{
 
           if(isDoorRemoved){
             if(b.id==="door-final"){
-
+              console.log(b.id)
               return;
             }
           }
@@ -377,7 +372,7 @@ k.scene("right-scene",async()=>{
             k.sprite("right-scene"),
             k.scale(3),
             k.pos(0),
-            k.offscreen()
+
       ])
     const gate = rightMap.add([
             k.sprite("gate",{
@@ -391,16 +386,24 @@ k.scene("right-scene",async()=>{
  
     for (const layer of layers) {
       if (layer.name === "boundaries") {
-        for (const boundary of layer.objects) {
+        // Batch add boundaries
+        const boundaries = layer.objects.map(boundary => ({
+          area: {
+            shape: new k.Rect(k.vec2(0), boundary.width, boundary.height)
+          },
+          pos: k.vec2(boundary.x, boundary.y),
+          body: { isStatic: true },
+          id: boundary.name
+        }));
+
+        boundaries.forEach(b => {
           rightMap.add([
-            k.area({
-              shape: new k.Rect(k.vec2(0), boundary.width, boundary.height)
-            }),
-            k.pos(boundary.x, boundary.y),
-            k.body({ isStatic: true }),
-            boundary.name
+            k.area(b.area),
+            k.pos(b.pos),
+            k.body(b.body),
+            b.id
           ]);
-        }
+        });
       }
 
       if (layer.name === "spawnpoint") {
@@ -412,11 +415,22 @@ k.scene("right-scene",async()=>{
         
         player.pos = k.vec2((rightMap.pos.x + spawnpoint.x) * 3, (rightMap.pos.y + spawnpoint.y) * 3);
         k.add(player);
-        await k.loop(0.1, () => {
+
+        let movementSteps = 0;
+        player.play("walk-right");
+        
+        // Start movement loop without await
+        k.loop(0.1, () => {
           player.move(player.speed, 0);
-          if (player.getCurAnim()?.name !== "walk-right") player.play("walk-right");
-        }, 8);
-        player.play("idle-right");
+          if (player.getCurAnim()?.name !== "walk-right") {
+            player.play("walk-right");
+          }
+          movementSteps++;
+          if (movementSteps >= 8) {
+            player.play("idle-right");
+            return false; // Stop the loop
+          }
+        },8);
       }
     }
     
