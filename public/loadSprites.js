@@ -26,8 +26,9 @@ export default function loadSprites(){
     k.loadSprite("scene1","./assets/scene1-map.png");
     k.loadSprite("scene2","./assets/scene2-map.png");
     k.loadSprite("right-scene","./assets/right-scene.png");
-    k.loadSprite("scene2-walkthrough","./assets/scene2-walk-through.png")
-    k.loadSprite("right-scene-upmost","./assets/right-scene-upmost.png")
+    k.loadSprite("final-scene","./assets/final-scene.png")
+    k.loadSprite("scene2-walkthrough","./assets/scene2-walk-through.png");
+    k.loadSprite("right-scene-upmost","./assets/right-scene-upmost.png");
     k.loadSprite("gate","./assets/gate.png",{
         sliceX:8,
         anims:{

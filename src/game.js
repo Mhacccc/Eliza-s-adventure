@@ -8,11 +8,15 @@ import { area } from "motion/react-client";
 loadSprites();
 
 let key = 0;
-let gateKey = 1;
+let gateKey = 0;
 let finalDoorKey = 0;
 let isGateOpen = false;
 let isGateRemoved = false;
 let isDoorRemoved = false;
+let isGateInteracted = false;
+let chimneyPass = false;
+let isBeerFound = false;
+let stopDeadman = false;
 
 
 const map = k.add([
@@ -29,7 +33,7 @@ function createPlayer() {
         k.sprite("eliza", { anim: "idle-down" }),
         k.pos(),
         k.anchor("center"),
-        k.scale(4),
+        k.scale(3.5),
         k.area({
             shape: new k.Rect(k.vec2(0,3),12,17)
         }),
@@ -293,13 +297,6 @@ k.scene("scene-2",async (spawns="spawnpoint",idleSpawn="idle-up")=>{
         }));
 
         boundaries.forEach(b => {
-
-          if(isDoorRemoved){
-            if(b.id==="door-final"){
-              console.log(b.id)
-              return;
-            }
-          }
           map2.add([
             k.area(b.area),
             k.pos(b.pos),
@@ -358,6 +355,7 @@ k.scene("scene-2",async (spawns="spawnpoint",idleSpawn="idle-up")=>{
 
         if(finalDoorKey>0){
           doorFinal.play("door-final-open")
+          window.showDialog("Door Unlocked!!!")
           await k.wait(0.5)
           map2.get("door-final")[0].paused = true
           isDoorRemoved = true
@@ -368,10 +366,22 @@ k.scene("scene-2",async (spawns="spawnpoint",idleSpawn="idle-up")=>{
         
     })
 
+    player.onCollide("chimney",()=>{
+      if(!chimneyPass)return;
+      window.showDialog(["...","You found a bottle of beer!!!"])
+      isBeerFound = true;
+      chimneyPass = false;
+    })
+
+    player.onCollide("final-gate",()=>{
+      k.go("final-scene");
+    })
+
 })
 
 k.scene("right-scene",async()=>{
-  
+
+
 
     const mapData= await (await fetch("assets/right-scene.json")).json();
     const layers = mapData.layers
@@ -452,9 +462,29 @@ k.scene("right-scene",async()=>{
             k.z(20)
       ])
 
-      player.onCollide("deadman",()=>{
-       
-          window.showDialog("Please, Help me!!!");
+      player.onCollide("deadman",(deadman)=>{
+
+          if(stopDeadman)return;
+          if(chimneyPass){
+            window.showDialog("MAN: ZZZzzzZZzzzZZzzzzzZZZzz")
+            return;
+          }
+          if(isBeerFound){
+            window.showDialog(["MAN: Yes!!! Thank you !!!","MAN: Here's your gate key", "YOU ACQUIRED THE GATE KEY!","YOU CAN NOW ENTER THE GATE!"])
+            gateKey++
+            stopDeadman = true;
+            return;
+          }
+          if(!isGateInteracted){
+            window.showDialog("Please, Help me!!!");
+          }else{
+            chimneyPass = true;
+            window.showDialog(["MAN: Can't pass the gate right?","MAN: I can help you find the key.","MAN: But first you must do something for me.","ELIZA: What is it???","MAN: Find me a beer, then maybe i can help you.","ELIZA: But how can i find one?","MAN: I don't know, that's your problem"])
+            return ;
+          };
+
+
+
 
       })
       player.onCollide("Password",()=>{
@@ -462,14 +492,14 @@ k.scene("right-scene",async()=>{
         
           window.showDialog(["This is a small vault...","The vault has password.",
                               "And There's a little hint.","It says...",
-                              `When did you fall in love with mhac?`])
+                              `"The day you fell in love with me"`])
 
           k.onUpdate("Password",(password)=>{
             
             if(!isInDialogue){
-              const pass = prompt("Use this format:    mm/dd/yy")
-              if(pass==="12/16/22"||pass==="12/16/2022"){
-              window.showDialog(["You got the key!!!","The key to final door."])
+              const pass = prompt("Enter your password")
+              if(pass==="friday"||pass==="Friday"){
+              window.showDialog(["YOU GOT THE KEY!!!","The key to final door."])
               finalDoorKey++
               k.destroy(password)
               }else{
@@ -486,8 +516,11 @@ k.scene("right-scene",async()=>{
       player.onCollide("gate-locked",async()=>{
         if(gateKey === 0){
           window.showDialog("The gate is locked! You need to find the key")
+          isGateInteracted = true;
           return;
         }
+        window.showDialog(["THE DOOR UNLOCKED!!!",".....","But the door has an extra security.","The door has a challenge question.","Answer it and you can finally enter.","What's my favorite band."])
+        prompt("Enter your answer");
         gate.play("gate-open")
         await k.wait(0.3)
         rightMap.get("gate-locked")[0].destroy()
@@ -501,6 +534,74 @@ k.scene("right-scene",async()=>{
         k.go("scene-2","right-spawnpoint","idle-left")
       })
 })
+
+  k.scene("final-scene",async()=>{
+    
+    const mapData= await (await fetch("assets/final-scene.json")).json();
+    const layers = mapData.layers
+    const rightMap = k.add([
+            k.sprite("final-scene"),
+            k.scale(3),
+            k.pos(0),
+
+      ])
+ 
+    for (const layer of layers) {
+      if (layer.name === "boundaries") {
+        // Batch add boundaries
+        const boundaries = layer.objects.map(boundary => ({
+          area: {
+            shape: new k.Rect(k.vec2(0), boundary.width, boundary.height)
+          },
+          pos: k.vec2(boundary.x, boundary.y),
+          body: { isStatic: true },
+          id: boundary.name
+        }));
+
+        boundaries.forEach(b => {
+          rightMap.add([
+            k.area(b.area),
+            k.pos(b.pos),
+            k.body(b.body),
+            b.id
+          ]);
+        });
+      }
+
+      if (layer.name === "spawnpoint") {
+        const spawnpoint = layer.objects[0];
+        
+        // Create new player instance for this scene
+        player.destroy();
+        player = createPlayer();
+        
+        player.pos = k.vec2((rightMap.pos.x + spawnpoint.x) * 3, (rightMap.pos.y + spawnpoint.y) * 3);
+        k.add(player);
+
+        let movementSteps = 0;
+        player.play("walk-up");
+        
+        // Start movement loop without await
+        k.loop(0.1, () => {
+          player.move(0, -player.speed);
+          if (player.getCurAnim()?.name !== "walk-up") {
+            player.play("walk-up");
+          }
+          
+          movementSteps++;
+          if (movementSteps >= 8) {
+            player.play("idle-up");
+          }
+        },8);
+      }
+      
+    }
+
+    player.onCollide("mhac",()=>{
+      window.showDialog(["wow congrats naka abot ka sa final stage"])
+    })
+
+  })
 
 makeTile()
 
