@@ -9,10 +9,12 @@ loadSprites();
 
 let key = 0;
 let gateKey = 1;
+let finalDoorKey = 0;
 let isGateOpen = false;
 let isGateRemoved = false;
 let isDoorRemoved = false;
- 
+
+
 const map = k.add([
     k.sprite("scene1"),
     k.pos(0),
@@ -353,11 +355,16 @@ k.scene("scene-2",async (spawns="spawnpoint",idleSpawn="idle-up")=>{
     ]);
   
     player.onCollide("door-final",async ()=>{
-      
-        doorFinal.play("door-final-open")
-        await k.wait(0.5)
-        map2.get("door-final")[0].paused = true
-        isDoorRemoved = true
+
+        if(finalDoorKey>0){
+          doorFinal.play("door-final-open")
+          await k.wait(0.5)
+          map2.get("door-final")[0].paused = true
+          isDoorRemoved = true
+        }else{
+          window.showDialog(["The door is locked.", "Find the key."])
+        }
+
         
     })
 
@@ -425,10 +432,10 @@ k.scene("right-scene",async()=>{
           if (player.getCurAnim()?.name !== "walk-right") {
             player.play("walk-right");
           }
+          
           movementSteps++;
           if (movementSteps >= 8) {
             player.play("idle-right");
-            return false; // Stop the loop
           }
         },8);
       }
@@ -453,7 +460,26 @@ k.scene("right-scene",async()=>{
       player.onCollide("Password",()=>{
           
         
-          window.showDialog("Enter PassWord")
+          window.showDialog(["This is a small vault...","The vault has password.",
+                              "And There's a little hint.","It says...",
+                              `When did you fall in love with mhac?`])
+
+          k.onUpdate("Password",(password)=>{
+            
+            if(!isInDialogue){
+              const pass = prompt("Use this format:    mm/dd/yy")
+              if(pass==="12/16/22"||pass==="12/16/2022"){
+              window.showDialog(["You got the key!!!","The key to final door."])
+              finalDoorKey++
+              k.destroy(password)
+              }else{
+                window.showDialog("Wrong password")
+              }
+              
+            }
+          })
+
+         
                 
       })
 
