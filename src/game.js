@@ -1,6 +1,6 @@
 import k from "./kaplayCtx";
 import loadSprites from "../public/loadSprites.js";
-import { area } from "motion/react-client";
+
 
 
 
@@ -9,10 +9,10 @@ loadSprites();
 
 let key = 0;
 let gateKey = 0;
-let finalDoorKey = 0;
+let finalDoorKey = 1;
 let isGateOpen = false;
 let isGateRemoved = false;
-let isDoorRemoved = false;
+
 let isGateInteracted = false;
 let chimneyPass = false;
 let isBeerFound = false;
@@ -278,9 +278,7 @@ k.scene("scene-2",async (spawns="spawnpoint",idleSpawn="idle-up")=>{
     ]);
 
     const doorFinal = map2.add([
-        k.sprite("door-final",{
-          frame: !isDoorRemoved?0:4
-        }),
+        k.sprite("door-final"),
         k.pos(k.vec2(400,128))
       ])
       
@@ -351,14 +349,27 @@ k.scene("scene-2",async (spawns="spawnpoint",idleSpawn="idle-up")=>{
             k.z(20)
     ]);
   
-    player.onCollide("door-final",async ()=>{
+    player.onCollide("door-final",()=>{
 
         if(finalDoorKey>0){
-          doorFinal.play("door-final-open")
-          window.showDialog("Door Unlocked!!!")
-          await k.wait(0.5)
-          map2.get("door-final")[0].paused = true
-          isDoorRemoved = true
+          
+          window.showDialog(["THE DOOR UNLOCKED!!!",".....","But the door has an extra security.","The door has a challenge question.","Answer it and you can finally enter.","What's my favorite band."]);
+          
+          k.onUpdate("door-final",async(doorUpd)=>{
+          if(!window.isInDialogue){
+             const ans = prompt("Enter your answer");
+              if(ans.toLowerCase()==="ivos"||ans.toLowerCase()==="iv of spades"){
+                  window.showDialog("Door Opened!")
+                  doorFinal.play("door-final-open")
+                  await k.wait(0.5)
+                  map2.get("door-final")[0].paused = true
+                  doorUpd.destroy();
+              }else{
+                window.showDialog("Wrong Password!")
+              }
+          }  
+          })
+
         }else{
           window.showDialog(["The door is locked.", "Find the key."])
         }
@@ -519,8 +530,7 @@ k.scene("right-scene",async()=>{
           isGateInteracted = true;
           return;
         }
-        window.showDialog(["THE DOOR UNLOCKED!!!",".....","But the door has an extra security.","The door has a challenge question.","Answer it and you can finally enter.","What's my favorite band."])
-        prompt("Enter your answer");
+        window.showDialog("The Gate Opened!")
         gate.play("gate-open")
         await k.wait(0.3)
         rightMap.get("gate-locked")[0].destroy()
@@ -598,7 +608,44 @@ k.scene("right-scene",async()=>{
     }
 
     player.onCollide("mhac",()=>{
-      window.showDialog(["wow congrats naka abot ka sa final stage"])
+      let done = 0;
+      window.showDialog(["MHAC: Hello po!","MHAC: Gusto ba ng ice cream ng baby ko? Or Gift?","MHAC: Well, bago yan, need mo munang sagutin ang mga tanong ko.","MHAC: First Question is..."])
+      const questions = k.onUpdate(()=>{
+          if (!window.isInDialogue) {
+          if (done === 0) {
+            const ans1 = prompt("Ano ang unang meal na kumain tayo magkasama?");
+            if (ans1 === "shawarma") {
+              done = 1;
+              window.showDialog("Correct! Here's the next question...");
+            } else {
+              window.showDialog(["Wrong answer!","Try again."]);
+            }
+          } else if (done === 1) {
+            const ans2 = prompt("Ano ang first movie na pinanood natin together?");
+            if (ans2 === "about time") {
+              done = 2;
+              window.showDialog("Correct! Final question...");
+            } else {
+              window.showDialog(["Wrong answer!","Try again."]);
+            }
+          } else if (done === 2) {
+            const ans3 = prompt("What's my favorite color?");
+            if (ans3 === "black") {
+              window.showDialog(["All answers correct!","MHAC: Congrats po babyyy!!!","MHAC: At dahil dyan may gift ako sa iyo hehe."]);
+              done = 3;
+            } else {
+              window.showDialog(["Wrong answer!","Try again."]);
+            }
+          }else if(done===3){
+            questions.cancel()
+          }
+      }
+      
+      })
+
+
+        
+   
     })
 
   })
