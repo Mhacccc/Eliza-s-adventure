@@ -9,7 +9,7 @@ loadSprites();
 
 let key = 0;
 let gateKey = 0;
-let finalDoorKey = 1;
+let finalDoorKey = 0;
 let isGateOpen = false;
 let isGateRemoved = false;
 
@@ -607,10 +607,30 @@ k.scene("right-scene",async()=>{
       }
       
     }
+    let picture = false
+    let lux = false
     let done = 0;
     player.onCollide("mhac",()=>{
-      
-      window.showDialog(["MHAC: Hello po!","MHAC: Gusto ba ng ice cream ng baby ko? Or Gift?","MHAC: Well, bago yan, need mo munang sagutin ang mga tanong ko.","MHAC: First Question is..."])
+      if(picture===true){
+        window.showDialog("MHAC: Check mo po bag mo!");
+        picture = false;
+        lux = true;
+        return;
+      }
+      if(lux){
+        window.showDialog("LUX???")
+        const luxury = k.onUpdate(()=>{
+          if(!window.isInDialogue){
+            const ans = confirm("Ano sagot!!!")
+            if(ans){
+              window.showDialog("YOWNNNNN, TARA NAAAAA")
+              luxury.cancel()
+            }
+          }
+        })
+      }
+      if(!lux){
+              window.showDialog(["MHAC: Hello po!","MHAC: Gusto ba ng ice cream ng baby ko? Or Gift?","MHAC: Well, bago yan, need mo munang sagutin ang mga tanong ko.","MHAC: First Question is..."])
       const questions = k.onUpdate(()=>{
           if (!window.isInDialogue) {
           if (done === 0) {
@@ -644,18 +664,24 @@ k.scene("right-scene",async()=>{
       
       })
 
-      player.onUpdate(()=>{
-        if(!isInDialogue&&done===3){
+      const letter = k.onUpdate(()=>{
+       
+        if(!isInDialogue&&done===3&&!picture){
                 const poetry = k.add([
                 k.sprite("poetry", {
-                  // Make size responsive to screen dimensions
-                  width: Math.min(k.width() * 0.8, 500), 
-                  height: Math.min(k.height() * 0.8, 500)
-                }),
-                k.pos(player.pos),
-                k.anchor("center"),
-                k.opacity(0), // Start fully transparent
+                    // Make size responsive to screen dimensions
+                    width: Math.min(k.width() * 0.8, 500), 
+                    height: Math.min(k.height() * 0.8, 500)
+                  }),
+                  k.pos(player.pos),
+                  k.area({
+                    shape: new k.Rect(k.vec2(151,-230), 20, 20),
+                  }),
+                  k.anchor("center"),
+                  k.opacity(0), // Start fully transparent
                 k.z(100),
+                "Poetry"
+
               ]);
 
               // Wait for dialogue to finish then fade in
@@ -672,12 +698,17 @@ k.scene("right-scene",async()=>{
                   }
                 });
               });
+        picture = true;
+        isInDialogue=true;
+        k.onClick("Poetry",()=>{
+          isInDialogue = false;
+          poetry.destroy();
+          letter.cancel();
+        })
         }
       })
 
-
-        
-   
+      }
     })
 
   })
