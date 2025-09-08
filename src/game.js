@@ -7,9 +7,9 @@ import loadSprites from "../public/loadSprites.js";
 
 loadSprites();
 
-let key = 0;
+let key = 1;
 let gateKey = 0;
-let finalDoorKey = 0;
+let finalDoorKey = 1;
 let isGateOpen = false;
 let isGateRemoved = false;
 
@@ -609,7 +609,7 @@ k.scene("right-scene",async()=>{
     }
     let picture = false
     let lux = false
-    let done = 0;
+    let done = 3;
     player.onCollide("mhac",()=>{
       if(picture===true){
         window.showDialog("MHAC: Check mo po bag mo!");
@@ -669,16 +669,16 @@ k.scene("right-scene",async()=>{
         if(!isInDialogue&&done===3&&!picture){
                 const poetry = k.add([
                 k.sprite("poetry", {
-                    // Make size responsive to screen dimensions
-                    width: Math.min(k.width() * 0.8, 500), 
-                    height: Math.min(k.height() * 0.8, 500)
-                  }),
-                  k.pos(player.pos),
-                  k.area({
-                    shape: new k.Rect(k.vec2(151,-230), 20, 20),
-                  }),
-                  k.anchor("center"),
-                  k.opacity(0), // Start fully transparent
+                    // Make size responsive to screen dimensions but bigger
+                    width: Math.min(k.width() * 0.96, 700), 
+                    height: Math.min(k.height() * 0.7, 700)
+                    }),
+                    k.pos(player.pos),
+                    k.area({
+                    shape: new k.Rect(k.vec2(160,-217), 20, 20),
+                    }),
+                    k.anchor("center"),
+                    k.opacity(0), // Start fully transparent
                 k.z(100),
                 "Poetry"
 
