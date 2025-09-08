@@ -532,6 +532,7 @@ k.scene("right-scene",async()=>{
         }
         window.showDialog("The Gate Opened!")
         gate.play("gate-open")
+
         await k.wait(0.3)
         rightMap.get("gate-locked")[0].destroy()
         isGateOpen = true;
@@ -606,9 +607,9 @@ k.scene("right-scene",async()=>{
       }
       
     }
-
+    let done = 0;
     player.onCollide("mhac",()=>{
-      let done = 0;
+      
       window.showDialog(["MHAC: Hello po!","MHAC: Gusto ba ng ice cream ng baby ko? Or Gift?","MHAC: Well, bago yan, need mo munang sagutin ang mga tanong ko.","MHAC: First Question is..."])
       const questions = k.onUpdate(()=>{
           if (!window.isInDialogue) {
@@ -631,7 +632,7 @@ k.scene("right-scene",async()=>{
           } else if (done === 2) {
             const ans3 = prompt("What's my favorite color?");
             if (ans3 === "black") {
-              window.showDialog(["All answers correct!","MHAC: Congrats po babyyy!!!","MHAC: At dahil dyan may gift ako sa iyo hehe."]);
+              window.showDialog(["All answers correct!","MHAC: Congrats po babyyy!!!","MHAC: At dahil dyan may gift ako sa iyo hehe.","YOU RECEIVE A LETTER!!!"])
               done = 3;
             } else {
               window.showDialog(["Wrong answer!","Try again."]);
@@ -641,6 +642,37 @@ k.scene("right-scene",async()=>{
           }
       }
       
+      })
+
+      player.onUpdate(()=>{
+        if(!isInDialogue&&done===3){
+                const poetry = k.add([
+                k.sprite("poetry", {
+                  // Make size responsive to screen dimensions
+                  width: Math.min(k.width() * 0.8, 500), 
+                  height: Math.min(k.height() * 0.8, 500)
+                }),
+                k.pos(player.pos),
+                k.anchor("center"),
+                k.opacity(0), // Start fully transparent
+                k.z(100),
+              ]);
+
+              // Wait for dialogue to finish then fade in
+              k.wait(0.5, () => {
+                const FADE_TIME = 1;
+                let opacity = 0;
+                
+                const fadeIn = k.onUpdate(() => {
+                  opacity = Math.min(opacity + k.dt()/FADE_TIME, 1);
+                  poetry.opacity = opacity;
+                  
+                  if(opacity >= 1) {
+                    fadeIn.cancel();
+                  }
+                });
+              });
+        }
       })
 
 
